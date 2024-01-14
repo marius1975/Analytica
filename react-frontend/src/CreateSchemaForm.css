@@ -1,0 +1,230 @@
+
+.container {
+
+  /*max-width: 800px;*/
+  margin: 0 auto;
+  padding: 20px;
+}
+
+
+h1 {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+h2 {
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+.create-button {
+
+  background-color: #4caf50;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+  margin-right: 30px;
+}
+
+.create-button:hover {
+  background-color: #45a049;
+}
+
+.database-select {
+  padding: 10px;
+}
+
+.context-menu {
+  position: absolute;
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 5px;
+  z-index: 1;
+  cursor: pointer;
+}
+
+.custom-table {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 5px;
+  cursor: pointer;
+}
+
+.custom-table.selected {
+  background-color: #f0f0f0;
+}
+
+.modal {
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 55%;
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 10% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.drop-area {
+  border: 2px dashed #ccc;
+  border-radius: 5px;
+  padding: 20px;
+  text-align: center;
+  margin-top: 20px;
+  cursor: pointer;
+}
+
+.drop-text {
+  font-size: 16px;
+  color: #777;
+}
+
+.table-list{
+width: 15%;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+th {
+  background-color: #4caf50;
+  color: white;
+}
+
+th, td {
+  font-size: 14px;
+}
+
+.display-table-data-option {
+  position: absolute;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  padding: 8px;
+  cursor: pointer;
+}
+
+/* Add this style for the close button in the displayed table data */
+.close-button {
+  font-size: 15px;
+  color: red;
+  cursor: pointer;
+  float: right;
+  margin-top: -5px;
+  margin-right: 10px; /* Add margin to the right */
+}
+
+.close-button:hover {
+  color: black;
+}
+
+#filters {
+  display: flex;
+  /*flex-wrap: wrap;*/
+  gap: 20px;
+  padding: 20px;
+  background-color: #f4f4f4;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+#filters div {
+  flex: 1 1 50px; /* Adjust the width as needed */
+}
+
+label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+
+
+li:hover {
+  background-color: #e0e0e0;
+}
+
+button {
+  padding: 10px;
+  background-color: #4caf50;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+
+/*Style for the type-ahead input*/
+div#filters input[type="text"] {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 5px;
+  margin-top: 5px;
+  position: relative;
+}
+
+div#filters input[type="text"] + ul {
+  max-height: 150px; /* Set your desired max height for the list */
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 5px;
+  margin-top: 5px;
+  position: absolute; /* Set position to absolute */
+  z-index: 1;
+  width: auto;
+  box-sizing: border-box;
+  background-color: #fff;
+}
+
+/* Add these styles for the list items within the type-ahead list */
+div#filters input[type="text"] + ul li {
+  cursor: pointer;
+  padding: 5px;
+  transition: background-color 0.3s ease;
+}
+
+/* Add hover effect for list items */
+div#filters input[type="text"] + ul li:hover {
+  background-color: #e0e0e0;
+}

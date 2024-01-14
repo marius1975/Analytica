@@ -1,0 +1,67 @@
+/* Add styles for the RegistrationForm component */
+.RegistrationForm {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 20px;
+  text-align: center;
+  background-color: #f5f5f5;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-top: 10%;
+}
+
+.RegistrationForm h1 {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.RegistrationForm label {
+  display: block;
+  text-align: left;
+  margin-bottom: 5px;
+}
+
+.RegistrationForm input[type="text"],
+.RegistrationForm input[type="email"],
+.RegistrationForm input[type="password"] {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+.RegistrationForm button[type="submit"] {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  margin-top: 15px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.RegistrationForm button[type="submit"]:hover {
+  background-color: #0056b3;
+}
+
+/* Style the "Switch to Login" button */
+.RegistrationForm button.switch-button {
+  background-color: #ccc;
+  color: #000;
+  border: none;
+  border-radius: 5px;
+  margin-top: 10px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.RegistrationForm button.switch-button:hover {
+  background-color: #999;
+}
