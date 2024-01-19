@@ -20,7 +20,7 @@ public class DB_Connection {
         String jdbcUrl = "jdbc:mysql://localhost:3306/";//analytica_users
         Properties connectionProperties = new Properties();
         connectionProperties.setProperty("user", "root");
-        connectionProperties.setProperty("password", "Parolamea_1@"); //loadPasswordFromConfigFile()
+        connectionProperties.setProperty("password", loadPasswordFromConfigFile()); //loadPasswordFromConfigFile()
         return DriverManager.getConnection(jdbcUrl, connectionProperties);
     }
     public static String loadPasswordFromConfigFile() {
