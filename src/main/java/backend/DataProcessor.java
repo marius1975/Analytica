@@ -200,7 +200,7 @@ public class DataProcessor {
         String jdbcUrl = "jdbc:mysql://localhost:3306/" + selectedDatabase;
         Properties connectionProperties = new Properties();
         connectionProperties.setProperty("user", "root");
-        connectionProperties.setProperty("password", "Parolamea_1@"); //loadPasswordFromConfigFile()
+        connectionProperties.setProperty("password", loadPasswordFromConfigFile()); //loadPasswordFromConfigFile()
 
         try {
             String tableName = "table_" + uploadedFileObj.getName().toLowerCase().replaceAll("[^a-zA-Z0-9]+", "_");
