@@ -2,33 +2,30 @@
 package org.example;
 import backend.*;
 import com.google.gson.Gson;
-import org.apache.hadoop.shaded.com.google.gson.JsonObject;
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
+import org.apache.hadoop.shaded.com.google.gson.GsonBuilder;
 import org.apache.spark.sql.*;
-import scala.collection.Seq;
-import scala.xml.Source;
 import spark.Request;
+import spark.Response;
 import spark.Session;
 import spark.Spark;
 
 //import javax.ws.rs.core.Request;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Type;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
-import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.servlet.http.Part;
-
-import static backend.DataProcessor.*;
-import static org.glassfish.jersey.message.internal.Utils.createTempFile;
 import static spark.Spark.*;
 import javax.servlet.MultipartConfigElement;
-import javax.servlet.http.Part;
 
 public class Main {
 
@@ -109,28 +106,62 @@ public class Main {
             }
         });
 
-// Update the /api/login endpoint to perform user authentication
-        // Update the /api/login endpoint to perform user authentication
+        /*post("/api/login", (req, res) -> {
+            try (Connection connection = dbConnection.createConnectionToDatabase()) {
+                loginData.set(new Gson().fromJson(req.body(), LoginData.class));
+
+
+                // Call the loginUser method to authenticate the user
+                Session session = loginData.get().loginUser(connection, req.session());
+
+                if (session != null) {
+
+                    // Successful login, set the appropriate attribute in the session
+                    if (session.attribute("loggedInUserId") != null) {
+
+                        req.session().attribute("loggedInUserId", session.attribute("loggedInUserId"));
+                    } else {
+                        req.session().attribute("loggedInUsername", loginData.get().getUsername());
+                    }
+
+                    res.status(200); // OK
+                    return "Login successful";
+                } else {
+                    // Invalid credentials
+                    res.status(401); // Unauthorized
+                    return "Invalid username or password";
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                res.status(500); // Internal server error
+                return "Login failed";
+            }
+        });
+*/
+
         post("/api/login", (req, res) -> {
             try (Connection connection = dbConnection.createConnectionToDatabase()) {
                 loginData.set(new Gson().fromJson(req.body(), LoginData.class));
 
                 // Call the loginUser method to authenticate the user
-                Session loggedInUserId = loginData.get().loginUser(connection, req.session());
-                Session loggedInUsername = loginData.get().loginUser(connection, req.session());
+                Session session = loginData.get().loginUser(connection, req.session());
 
-                if (loggedInUserId != null) {
-                    // Successful login, set the user ID in the session
-                    req.session().attribute("loggedInUserId", loggedInUserId);
+                if (session != null) {
+                    // Successful login, set the appropriate attribute in the session
+                    if (session.attribute("loggedInUserId") != null) {
+                        req.session().attribute("loggedInUserId", session.attribute("loggedInUserId"));
+                        System.out.println("loggedInUserId attribute set to: " + session.attribute("loggedInUserId"));
+                    } else {
+                        req.session().attribute("loggedInUsername", loginData.get().getUsername());
+                        System.out.println("loggedInUsername attribute set to: " + loginData.get().getUsername());
+                    }
+
+                    // Print the session ID and all attributes for verification
+                    System.out.println("Session ID: " + session.id());
+                    System.out.println("All session attributes: " + session.attributes());
+
                     res.status(200); // OK
-                    return loggedInUserId ;
-
-                }else if(loggedInUsername != null){
-                    // Successful login, set the user ID in the session
-                    req.session().attribute("loggedInUsername", loggedInUsername);
-                    res.status(200); // OK
-                    return loggedInUsername;
-
+                    return "Login successful";
                 } else {
                     // Invalid credentials
                     res.status(401); // Unauthorized
@@ -147,6 +178,7 @@ public class Main {
         post("/api/create-database/:dbName", (request, response) -> {
             System.out.println("Inside create-database route");
             try (Connection connection = dbConnection.createConnectionToDatabase()) {
+
                 String loggedInUserId = getUserId(request, loginData.get(), connection);
                 String loggedInUsername = getUsername(request, loginData.get(), connection);
                 // Check if the user is logged in
@@ -167,11 +199,54 @@ public class Main {
             }
         });
 
+        delete("/api/delete-database/:selectedDatabase", (request, response) -> {
+            System.out.println("Inside delete-database route");
+            try (Connection connection = dbConnection.createConnectionToDatabase()) {
+                String loggedInUserId = getUserId(request, loginData.get(), connection);
+                // Check if the user is logged in
+                if (loggedInUserId != null) {
+                    String dbNameToDelete = request.params(":selectedDatabase"); // Retrieve dbName from URL parameter
+                    System.out.println("Database name to delete: " + dbNameToDelete);
+
+                    // Implement the logic to delete the schema
+                    String deleteSchemaSQL = "DROP SCHEMA IF EXISTS " + dbNameToDelete;
+                    String deleteRecordSQL = "DELETE FROM analytica_users.user_databases WHERE database_name = ? AND user_id = ?";
+
+                    try {
+                        // Delete the schema
+                        try (PreparedStatement deleteSchemaStatement = connection.prepareStatement(deleteSchemaSQL)) {
+                            deleteSchemaStatement.execute();
+                        }
+
+                        // Delete the record from user_databases table
+                        try (PreparedStatement deleteRecordStatement = connection.prepareStatement(deleteRecordSQL)) {
+                            deleteRecordStatement.setString(1, dbNameToDelete);
+                            deleteRecordStatement.setString(2, loggedInUserId);
+                            deleteRecordStatement.executeUpdate();
+                        }
+
+                        return "Database deleted successfully";
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                        response.status(500);
+                        return "Failed to delete the database: " + e.getMessage();
+                    }
+                } else {
+                    response.status(401); // Unauthorized
+                    return "Not logged in.";
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                response.status(500);
+                return "Failed to delete the database: " + e.getMessage();
+            }
+        });
 
 // Get user's databases endpoint
         get("/api/user-databases", (req, res) -> {
             try (Connection connection = dbConnection.createConnectionToDatabase()) {
                 //LoginData loginData = new Gson().fromJson(req.body(), LoginData.class);
+
                 String loggedInUserId = getUserId(req, loginData.get(), connection);
 
                 // Check if the user is logged in
@@ -228,6 +303,7 @@ public class Main {
 
         get("/api/tables-in-database/:selectedDatabase", (req, res) -> {
             Connection connection = dbConnection.createConnectionToDatabase();
+
             String loggedInUserId = getUserId(req, loginData.get(), connection);
             String selectedDatabase = req.params(":selectedDatabase");
 
@@ -277,13 +353,14 @@ public class Main {
                 return "Failed to fetch total records: " + e.getMessage();
             }
         });
+
         post("/api/get-total-filtered-records/:selectedDatabase/:tableName", (req, res) -> {
             Connection connection = dbConnection.createConnectionToDatabase();
             String selectedDatabase = req.params(":selectedDatabase");
             String tableName = req.params(":tableName");
 
             // Retrieve filters from the request body
-            Map<String, String> filters = new Gson().fromJson(req.body(), Map.class);
+            Map<String, Object> filters = new Gson().fromJson(req.body(), Map.class);
 
             try {
                 int totalFilteredRecords = DataProcessor.getTotalFilteredRecords(connection, selectedDatabase, tableName, filters);
@@ -300,6 +377,7 @@ public class Main {
 
 
 
+
         get("/api/get-distinct-column-values/:selectedDatabase/:tableName/:columnName", (req, res) -> {
             Connection connection = dbConnection.createConnectionToDatabase();
             String selectedDatabase = req.params(":selectedDatabase");
@@ -311,18 +389,29 @@ public class Main {
             return new Gson().toJson(distinctValues);
         });
 
+
+
         post("/api/filter-table/:selectedDatabase/:tableName/:page/:pageSize", (req, res) -> {
             Connection connection = dbConnection.createConnectionToDatabase();
             String selectedDatabase = req.params(":selectedDatabase");
             String tableName = req.params(":tableName");
 
             // Get page and pageSize from the request
-            int page = Integer.parseInt(req.params(":page"));
-            int pageSize = Integer.parseInt(req.params(":pageSize"));
+            int page;
+            int pageSize;
+            try {
+                page = Integer.parseInt(req.params(":page"));
+                pageSize = Integer.parseInt(req.params(":pageSize"));
+            } catch (NumberFormatException e) {
+                // Handle the case where page or pageSize is missing or invalid
+                res.status(400); // Bad Request
+                return "Invalid page or pageSize parameter";
+            }
+
             Map<String, String> filters = new Gson().fromJson(req.body(), Map.class);
 
             // Call the getFilteredTableData method and return the result
-            List<Map<String, Object>> filteredData = DataProcessor.getFilteredTableData(connection, selectedDatabase, tableName,page, pageSize, filters);
+            List<Map<String, Object>> filteredData = DataProcessor.getFilteredTableData(connection, selectedDatabase, tableName, page, pageSize, filters);
             return new Gson().toJson(filteredData);
         });
 
@@ -344,9 +433,145 @@ public class Main {
             return new Gson().toJson(columns);
         });
 
+        post("/api/loginUser/:username/:password", (req, res) -> {
+            // Retrieve username and password from route parameters
+            String username = req.params(":username");
+            String password = req.params(":password");
+
+            Connection connection = null;
+            try {
+                // Create a connection to the database
+                connection = dbConnection.createConnectionToDatabase();
+
+                // Call getUserName method to retrieve the username
+                String loggedInUsername = dataProcessor.getUserName(connection, username, password);
+
+                if (loggedInUsername != null) {
+                    // Login successful, return the username
+                    return new Gson().toJson(loggedInUsername);
+                } else {
+                    // Login failed
+                    res.status(401);
+                    return "Login failed";
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                res.status(500);
+                return "Internal server error";
+            } finally {
+                // Close the database connection
+                if (connection != null) {
+                    try {
+                        connection.close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+
+        delete("/api/delete-table/:selectedDatabase/:tableName", (req, res) -> {
+            Connection connection = dbConnection.createConnectionToDatabase();
+            String loggedInUserId = getUserId(req, loginData.get(), connection);
+            String selectedDatabase = req.params(":selectedDatabase");
+            String tableName = req.params(":tableName");
+
+            if (loggedInUserId != null) {
+                boolean success = DataProcessor.deleteTable(connection, selectedDatabase, tableName);
+                if (success) {
+                    res.status(200);
+                    return "Table deleted successfully.";
+                } else {
+                    res.status(500);
+                    return "Failed to delete table.";
+                }
+            } else {
+                res.status(401); // Unauthorized
+                return "Not logged in.";
+            }
+        });
+
+        post("/api/download-table-data/:selectedDatabase/:tableName/:page/:pageSize", (req, res) -> {
+            Connection connection = dbConnection.createConnectionToDatabase();
+            String selectedDatabase = req.params(":selectedDatabase");
+            String tableName = req.params(":tableName");
+
+            // Get filters from the request body
+            Map<String, String> filters = new Gson().fromJson(req.body(), Map.class);
+
+            // Get page and pageSize from the request parameters
+            int page = Integer.parseInt(req.params(":page"));
+            int pageSize = Integer.parseInt(req.params(":pageSize"));
+            String format = req.params(":format");
+            // Call the backend method to generate and download the file
+            InputStream fileStream = DataProcessor.generateTableDataFile(connection, selectedDatabase, tableName,format, filters, page, pageSize);
+
+            // Set response headers
+            setResponseHeaders(res, tableName);
+
+            // Return the file stream
+            return fileStream;
+        });
+
+       /* post("/api/logoff", (req, res) -> {
+            Session session = req.session(false);
+
+            if (session != null) {
+                System.out.println(session);
+                session.invalidate();
+                res.status(200); // OK
+                return "Logoff successful";
+            } else {
+                res.status(401); // Unauthorized
+                return "Not logged in";
+            }
+        });
+*/
+
+        // Main.java
+
+        post("/api/logoff", (req, res) -> {
+            // Invalidate the session
+            req.session().invalidate();
+            res.status(200); // OK
+            return "Logoff successful";
+        });
+
+
+
+
+       /* // Define the endpoint for calculating percentage difference
+        post("/api/calculate-percentage/:selectedDatabase/:tableName/:columnName", (req, res) -> {
+            Connection connection = dbConnection.createConnectionToDatabase();
+            String selectedDatabase = req.params(":selectedDatabase");
+            String tableName = req.params(":tableName");
+            String columnName = req.params(":columnName");
+
+            // Retrieve filters from the request body
+            Map<String, Object> filters = new Gson().fromJson(req.body(), Map.class);
+
+            try {
+                // Call your calculation method here and return the result
+                Map<String, Double> percentages = calculatePercentageDifference(connection, selectedDatabase, tableName, columnName, filters);
+                return new Gson().toJson(percentages);
+            } catch (Exception e) {
+                e.printStackTrace();
+                res.status(500); // Internal Server Error
+                return "Failed to calculate percentage difference: " + e.getMessage();
+            }
+        });*/
         // ... (Other endpoints and configurations)
+
+
     }
 
+
+    private static void setResponseHeaders(Response res, String fileName) {
+        // Set content disposition to indicate attachment and specify the file name
+        res.header("Content-Disposition", "attachment; filename=" + fileName + ".xlsx");
+        // Set content type for XLSX files
+        res.type("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    }
 
     private static String getUserId(Request request, LoginData loginData, Connection connection) {
         // Retrieve the user's ID from the session
@@ -357,24 +582,33 @@ public class Main {
             String loggedInUserId = session.attribute("loggedInUserId");
             System.out.println("loggedInUserId" + loggedInUserId);
             return loggedInUserId;
-        } catch (SQLException e) {
+        } catch (Exception e) { // Catch the more general Exception
             throw new RuntimeException(e);
         }
     }
 
-    private static String getUsername(Request request, LoginData loginData, Connection connection) {
-        // Retrieve the user's ID from the session
 
+
+
+
+
+   private static String getUsername(Request request, LoginData loginData, Connection connection) {
+        // Retrieve the user's ID from the session
         Session session = null;
         try {
             session = loginData.loginUser(connection, request.session());
             String loggedInUsername = session.attribute("loggedInUsername");
             System.out.println("loggedInUsername" + loggedInUsername);
             return loggedInUsername;
-        } catch (SQLException e) {
+        } catch (Exception e) {
+            // Catch the more general Exception
             throw new RuntimeException(e);
         }
     }
+
+
+
+
 
     private static class TotalRecordsResponse {
         private final int totalRecords;
@@ -408,6 +642,8 @@ public class Main {
 
 
 }
+
+
 
 
 
