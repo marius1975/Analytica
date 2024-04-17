@@ -1,27 +1,37 @@
 
 .container {
-
-  /*max-width: 800px;*/
+  max-width: auto;
   margin: 0 auto;
   padding: 20px;
 }
 
-
 h1 {
   font-size: 24px;
   margin-bottom: 10px;
+  color: green;
 }
 
 h2 {
   font-size: 20px;
   margin-bottom: 10px;
+  color: green;
+}
+
+.create-button:hover {
+  background-color: #45a049;
+}
+
+#create_db_input {
+  width: 150px;
+  box-sizing: border-box;
+  padding: 7px;
+  margin-top: 5px;
 }
 
 .create-button {
-
   background-color: #4caf50;
   color: white;
-  padding: 10px 20px;
+  padding: 7px 15px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
@@ -29,14 +39,89 @@ h2 {
   margin-right: 30px;
 }
 
-.create-button:hover {
-  background-color: #45a049;
+.create_db_container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+/* Align items to the start of the container */
+
 }
 
 .database-select {
   padding: 10px;
 }
+.custom-table {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 5px;
+  cursor: pointer;
+}
 
+.custom-table.selected {
+  background-color: #f0f0f0;
+}
+#column_counts_container,
+#pieChart_container {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
+
+#column_counts_container {
+  max-width: 50%;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-right: 400px; /* Adjust the margin to prevent overlap */
+}
+
+#pieChart_container {
+  width: 300px; /* Adjust the width as needed */
+  height: 300px; /* Adjust the height as needed */
+  margin-left: 20px; /* Adjust the margin to prevent overlap */
+}
+
+
+#column_counts_container h2 {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+#column_counts_container > div {
+  display: inline-block;
+  margin-right: 20px;
+  vertical-align: top;
+}
+
+#column_counts_container h3 {
+  font-size: 15px;
+  color: #AA126D;
+  margin-bottom: 10px;
+}
+
+#column_counts_container ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#column_counts_container li {
+  font-size: 12px;
+  margin-bottom: 5px;
+}
+
+/* Apply the border, fixed height, and scrollbar */
+#column_counts_container > div {
+  border: 1px solid #ccc;
+  padding: 5px;
+  height: 200px; /* Adjust the height as needed */
+  overflow-y: auto; /* Add a vertical scrollbar if needed */
+  background-color: #D5EEDC;
+}
+
+
+/* added */
 .context-menu {
   position: absolute;
   background-color: #f9f9f9;
@@ -99,6 +184,7 @@ h2 {
   text-align: center;
   margin-top: 20px;
   cursor: pointer;
+
 }
 
 .drop-text {
@@ -106,8 +192,9 @@ h2 {
   color: #777;
 }
 
-.table-list{
-width: 15%;
+.table-list {
+  width: 15%;
+  margin-bottom:25px;
 }
 
 table {
@@ -137,16 +224,25 @@ th, td {
   border: 1px solid #ccc;
   padding: 8px;
   cursor: pointer;
+
 }
 
+.logoff-button{
+background-color: red;
+}
 /* Add this style for the close button in the displayed table data */
+.delete-button{
+background-color: red;
+}
 .close-button {
   font-size: 15px;
   color: red;
   cursor: pointer;
   float: right;
   margin-top: -5px;
-  margin-right: 10px; /* Add margin to the right */
+  margin-right: 10px;
+/* Add margin to the right */
+
 }
 
 .close-button:hover {
@@ -154,17 +250,25 @@ th, td {
 }
 
 #filters {
+  color: #0D7362;
   display: flex;
-  /*flex-wrap: wrap;*/
+  flex-wrap: wrap;
   gap: 20px;
-  padding: 20px;
+  padding: 10px;
   background-color: #f4f4f4;
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  clear: both;
+/* Clear floating elements */
+
 }
 
 #filters div {
-  flex: 1 1 50px; /* Adjust the width as needed */
+  flex: 1 1 50px;
+/* Adjust the width as needed */
+
+
+
 }
 
 label {
@@ -172,8 +276,6 @@ label {
   font-weight: bold;
   margin-bottom: 5px;
 }
-
-
 
 li:hover {
   background-color: #e0e0e0;
@@ -195,6 +297,7 @@ button:hover {
 
 
 /*Style for the type-ahead input*/
+
 div#filters input[type="text"] {
   width: 100%;
   box-sizing: border-box;
@@ -204,27 +307,36 @@ div#filters input[type="text"] {
 }
 
 div#filters input[type="text"] + ul {
-  max-height: 150px; /* Set your desired max height for the list */
+  max-height: 150px;
+/* Set your desired max height for the list */
+
   overflow-y: auto;
   border: 1px solid #ccc;
   border-radius: 4px;
   padding: 5px;
   margin-top: 5px;
-  position: absolute; /* Set position to absolute */
+  position: absolute;
+/* Set position to absolute */
+
   z-index: 1;
   width: auto;
   box-sizing: border-box;
   background-color: #fff;
 }
 
+
 /* Add these styles for the list items within the type-ahead list */
+
 div#filters input[type="text"] + ul li {
   cursor: pointer;
   padding: 5px;
   transition: background-color 0.3s ease;
 }
 
+
 /* Add hover effect for list items */
+
 div#filters input[type="text"] + ul li:hover {
   background-color: #e0e0e0;
 }
+
