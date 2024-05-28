@@ -25,7 +25,7 @@ public class LoginData {
         this.password = password;
     }
 
-   
+    //process the login operation
     public Session loginUser(Connection connection, Session session) throws SQLException {
         String sql = "SELECT user_id, username FROM analytica_users.users WHERE username = ? AND password = ?";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
