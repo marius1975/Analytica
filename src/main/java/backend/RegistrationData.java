@@ -44,6 +44,7 @@ public class RegistrationData {
         this.password = password;
     }
 
+    //generates a unique user id 
     public static String generateUniqueUserId(Connection connection) throws SQLException {
         String userId = UUID.randomUUID().toString();
         String sql = "SELECT COUNT(*) FROM analytica_users.users WHERE user_id = ?";
@@ -66,6 +67,7 @@ public class RegistrationData {
         return null;
     }
 
+    //register the new users
     public String registerUser(Connection connection, Session session) throws SQLException {
         String generatedUserId = generateUniqueUserId(connection);
 
