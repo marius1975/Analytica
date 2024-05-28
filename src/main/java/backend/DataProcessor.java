@@ -1,9 +1,7 @@
 package backend;
-
 import java.io.*;
 import java.sql.*;
 import java.util.*;
-
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -28,33 +26,6 @@ public class DataProcessor {
         this.spark = spark;
     }
 
-   /* public static String createSchema(Connection connection, String userId, String dbName) throws SQLException {
-        System.out.println("Schema name: " + dbName);
-
-        // Implement the logic to create a new schema for the user
-        String createSchemaSQL = "CREATE SCHEMA IF NOT EXISTS " + dbName;
-        String insertSchemaRecordSQL = "INSERT INTO analytica_users.user_databases (user_id, database_name) VALUES (?, ?)";
-
-        try {
-            // Create the new schema
-            try (PreparedStatement createSchemaStatement = connection.prepareStatement(createSchemaSQL)) {
-                createSchemaStatement.execute();
-            }
-
-            // Insert a record into the user_databases table
-            try (PreparedStatement insertSchemaRecordStatement = connection.prepareStatement(insertSchemaRecordSQL)) {
-                insertSchemaRecordStatement.setString(1, userId);
-                insertSchemaRecordStatement.setString(2, dbName);
-                insertSchemaRecordStatement.executeUpdate();
-            }
-
-            return "Schema created successfully";
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
-        }
-    }
-*/
 
     public static String createSchema(Connection connection, String userId,String userName, String dbName) throws SQLException {
         System.out.println("Schema name: " + dbName);
@@ -108,9 +79,6 @@ public class DataProcessor {
 
         return databases;
     }
-
-
-
 
 
     public static List<String> insertFileIntoDatabase(String selectedDatabase, String uploadedFilePath, String loggedInUsername) {
@@ -295,46 +263,7 @@ public class DataProcessor {
             return totalRecords;
 
     }
-    /*public static int getTotalFilteredRecords(Connection connection, String selectedDatabase, String tableName, Map<String, String> filters) throws SQLException {
-        int totalFilteredRecords = 0;
-
-        // Build the WHERE clause based on filters
-        StringBuilder whereClause = new StringBuilder();
-        List<String> filterValues = new ArrayList<>();
-
-        if (filters != null && !filters.isEmpty()) {
-            whereClause.append(" WHERE ");
-            for (Map.Entry<String, String> entry : filters.entrySet()) {
-                whereClause.append(tableName).append(".").append(entry.getKey());
-                whereClause.append(" = ? AND ");
-                filterValues.add(entry.getValue());
-            }
-            // Remove the trailing " AND "
-            whereClause.setLength(whereClause.length() - 4); // Adjusted from -5 to -4
-        }
-
-        System.out.println("filter values:" + filterValues);
-
-        // Build the SQL query
-        String query = "SELECT COUNT(*) FROM " + selectedDatabase + "." + tableName + whereClause.toString();
-        PreparedStatement statement = connection.prepareStatement(query);
-
-        // Set filter values
-        int parameterIndex = 1;
-        for (String filterValue : filterValues) {
-            statement.setString(parameterIndex++, filterValue);
-        }
-
-        try (ResultSet resultSet = statement.executeQuery()) {
-            if (resultSet.next()) {
-                totalFilteredRecords = resultSet.getInt(1);
-                System.out.println("total filtered records: " + totalFilteredRecords);
-            }
-        }
-
-        return totalFilteredRecords;
-    }
-*/
+    
     public static int getTotalFilteredRecords(Connection connection, String selectedDatabase, String tableName, Map<String, String> filters) throws SQLException {
         int totalFilteredRecords = 0;
 
@@ -377,22 +306,6 @@ public class DataProcessor {
         return totalFilteredRecords;
     }
 
-
-    /*public static List<Map<String, Object>> getFilteredTableData(Connection connection, String selectedDatabase, String tableName,int page, int pageSize,
-             Map<String, String> filters) {
-
-
-        // Retrieve foreign key information
-        Map<String, String> foreignKeys = getForeignKeyInformation(connection, selectedDatabase, tableName);
-
-        // Build the SQL query with JOIN clauses based on foreign keys and filters
-        String query = buildFilteredQuery(selectedDatabase, tableName, filters, foreignKeys, page, pageSize);
-
-        // Execute the query and return the filtered data
-        return executeFilteredQuery(connection,selectedDatabase,query);
-        // added pageNumber, pageSize
-    }
-*/
 
     public static List<Map<String, Object>> getFilteredTableData(Connection connection, String selectedDatabase, String tableName, int page, int pageSize, Map<String, String> filters) {
         // Retrieve foreign key information
@@ -441,70 +354,6 @@ public class DataProcessor {
         return foreignKeys;
     }
 
-    /*private static String buildFilteredQuery(String selectedDatabase, String tableName, Map<String, String> filters, Map<String, String> foreignKeys, int page, int pageSize) {
-        StringBuilder queryBuilder = new StringBuilder("SELECT * FROM ");
-        queryBuilder.append(selectedDatabase).append(".").append(tableName);
-
-        // Add JOIN clauses based on foreign keys
-        for (Map.Entry<String, String> entry : foreignKeys.entrySet()) {
-            queryBuilder.append(" INNER JOIN ").append(selectedDatabase).append(".").append(entry.getValue());
-            queryBuilder.append(" ON ").append(tableName).append(".").append(entry.getKey());
-            queryBuilder.append(" = ").append(entry.getValue()).append(".").append(entry.getKey());
-        }
-
-        // Add WHERE clause based on filters
-        if (filters != null && !filters.isEmpty()) {
-            queryBuilder.append(" WHERE ");
-            for (Map.Entry<String, String> entry : filters.entrySet()) {
-                queryBuilder.append(tableName).append(".").append(entry.getKey());
-                queryBuilder.append(" = '").append(entry.getValue()).append("' AND ");
-            }
-            // Remove the trailing " AND "
-            queryBuilder.setLength(queryBuilder.length() - 5);
-        }
-
-        // Add pagination conditions to the SQL query only if there are no JOINs or WHERE conditions
-        if (foreignKeys.isEmpty() && (filters == null || filters.isEmpty())) {
-            queryBuilder.append(" LIMIT ").append(pageSize).append(" OFFSET ").append((page - 1) * pageSize);
-        }
-
-        return queryBuilder.toString();
-    }
-
-
-
-    private static List<Map<String, Object>> executeFilteredQuery(Connection connection, String selectedDatabase, String query) {
-        List<Map<String, Object>> result = new ArrayList<>();
-
-        try {
-            if (selectedDatabase == null) {
-                throw new SQLException("Database name is null");
-            }
-
-            // Execute the query and populate the result list
-            try (PreparedStatement statement = connection.prepareStatement(query)) {
-                ResultSet resultSet = statement.executeQuery();
-                ResultSetMetaData metaData = resultSet.getMetaData();
-                int columnCount = metaData.getColumnCount();
-
-                while (resultSet.next()) {
-                    Map<String, Object> rowData = new HashMap<>();
-                    for (int i = 1; i <= columnCount; i++) {
-                        String columnName = metaData.getColumnName(i);
-                        Object columnValue = resultSet.getObject(i);
-                        rowData.put(columnName, columnValue);
-                    }
-                    result.add(rowData);
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return result;
-    }
-
-*/
 
     private static String buildFilteredQuery(String selectedDatabase, String tableName, Map<String, String> filters, Map<String, String> foreignKeys, int page, int pageSize) {
         StringBuilder queryBuilder = new StringBuilder("SELECT * FROM ");
