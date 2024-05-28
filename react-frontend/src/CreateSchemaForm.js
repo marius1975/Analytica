@@ -1,6 +1,3 @@
-
-
-
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import React, { useState, useEffect, useRef} from 'react';
@@ -150,7 +147,7 @@ const fetchFilteredDataWithPercentage = async (filters, page) => {
 
 let myChart = null; // Declare a variable to hold the chart instance
 
-
+//renders the pie chart 
 useEffect(() => {
 
 const renderPieChart = (labels, columnPercentages) => {
@@ -272,6 +269,7 @@ useEffect(() => {
     setPage(1);
     },[selectedTable]);
 
+  //access the users databases 
   useEffect(() => {
     if (isLoggedIn) {
       fetch('http://localhost:8082/api/user-databases')
@@ -335,7 +333,7 @@ useEffect(() => {
     }
   };
 
-
+// delete a database from the list
 const handleDeleteDatabase = async (dbNameToDelete) => {
   // Prompt the user for confirmation
   const confirmDelete = window.confirm(`Are you sure you want to delete the database '${selectedDatabase}'?`);
@@ -439,7 +437,7 @@ useEffect(() => {
     //setIsFileDropped(true);
   };
 
-
+//upload files to database
 const handleFileUpload = async () => {
   if (!selectedDatabase || !selectedFile) {
     console.error('Please select a database and a file.');
@@ -539,7 +537,7 @@ const handlePageChange = async (newPage) => {
 
 
 
-
+//get the table data
 const fetchTableData = async() => {
  setIsFiltering(false);
     try {
@@ -572,7 +570,7 @@ const fetchTableData = async() => {
 
 
 
-
+// change the page size
 const handlePageSizeChange = (pageSize) => {
   setPageSize(pageSize);
   setPage(1); // Reset to the first page when changing page size
@@ -580,7 +578,7 @@ const handlePageSizeChange = (pageSize) => {
   setFilteredPage(1);
 };
 
-
+//get the total number of records available in a file
 const fetchTotalRecords = async () => {
   try {
     const response = await fetch(`http://localhost:8082/api/get-total-records/${selectedDatabase}/${selectedTable}`);
@@ -596,6 +594,7 @@ const fetchTotalRecords = async () => {
   }
 };
 
+  //get the total number of the filtered records from a file
 const fetchTotalFilteredRecords = async (filters, page) => {
   try {
     const response = await fetch(`http://localhost:8082/api/get-total-filtered-records/${selectedDatabase}/${selectedTable}`, {
@@ -623,6 +622,7 @@ const fetchTotalFilteredRecords = async (filters, page) => {
   }
 };
 
+  //get the distinct values from a column
 const fetchDistinctColumnValues = async (columnName) => {
   console.log("Selected Database:", selectedDatabase);
   console.log("Table Name:", selectedTable);
@@ -717,7 +717,7 @@ const fetchDistinctColumnValues = async (columnName) => {
   };
 
 
-
+// get the filtered table data
 const fetchFilteredData = async (filters, page) => {
   setIsFiltering(true);
 
@@ -751,7 +751,7 @@ const fetchFilteredData = async (filters, page) => {
 };
 
 
-
+// handles the type ahead functionality
     const handleTypeAheadInputChange = async (columnName, value) => {
         setInputValues((prevInputValues) => ({
           ...prevInputValues,
@@ -782,7 +782,7 @@ const fetchFilteredData = async (filters, page) => {
         }
       };
 
-
+// handles the type ahaead selection
 const handleTypeAheadSelect = async (columnName, selectedValue) => {
   setInputValues((prevInputValues) => ({
     ...prevInputValues,
@@ -800,7 +800,7 @@ const handleTypeAheadSelect = async (columnName, selectedValue) => {
 };
 
 
-
+//handles the change of the data base
   const handleDatabaseChange = (e) => {
     setSelectedDatabase(e.target.value);
     setSelectedOption(null);
@@ -832,6 +832,7 @@ const handleTypeAheadSelect = async (columnName, selectedValue) => {
     }
   };
 
+  //handles the closing option of a table
 const handleCloseTableData = () => {
   setSelectedTable(null);
   setSelectedTableData([]);
@@ -840,7 +841,7 @@ const handleCloseTableData = () => {
   setChartRendered(false);
 };
 
-
+//handles the delete table option 
   const handleDeleteTable = (e, tableName) => {
       fetch(`http://localhost:8082/api/delete-table/${selectedDatabase}/${selectedTable}`, {
           method: 'DELETE',
@@ -879,6 +880,7 @@ const handleCloseTableData = () => {
       });
   };
 
+  //handles the excel format download of a file
 const handleDownload = async () => {
     try {
         const response = await fetch(`http://localhost:8082/api/download-table-data/${selectedDatabase}/${selectedTable}/${page}/${pageSize}`, {
@@ -907,6 +909,7 @@ const handleDownload = async () => {
     }
 };
 
+  //handles the log off option
 const handleLogoff = async () => {
     try {
         const response = await fetch('http://localhost:8082/api/logoff', {
