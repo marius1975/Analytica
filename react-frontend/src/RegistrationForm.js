@@ -16,6 +16,7 @@ function RegistrationForm({ onLogin }) {
     });
   };
 
+  //handles the registration of a new user
   const handleSubmit = async (e) => {
     e.preventDefault();
 
