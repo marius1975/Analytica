@@ -14,6 +14,7 @@ public class DB_Connection {
     public DB_Connection(SparkSession spark) {
         this.spark = spark;
     }
+    //creates connection to the database
     public static Connection createConnectionToDatabase() throws SQLException {
         String jdbcUrl = "jdbc:mysql://localhost:3306/";//analytica_users
         Properties connectionProperties = new Properties();
