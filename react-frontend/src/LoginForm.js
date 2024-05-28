@@ -7,6 +7,7 @@ function LoginForm({ onSwitchForm, onLogin }) {
     password: '',
   });
 
+  
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -14,7 +15,8 @@ function LoginForm({ onSwitchForm, onLogin }) {
       [name]: value,
     });
   };
-
+  
+//handles the login option
   const handleLogin = async () => {
     try {
       const response = await fetch('http://localhost:8082/api/login', {
