@@ -34,18 +34,13 @@ function CreateSchemaForm({ isLoggedIn, onCreateSchema,loggedInUsername, onLogof
   const [selectedTableName, setSelectedTableName] = useState(''); // Track selected table name
   const [displayedData, setDisplayedData] = useState([]);
   const [contextMenuVisible_2, setContextMenuVisible_2] = useState(false);
-//added
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
-
   const [totalTablePages, setTotalTablePages] = useState(1);
-
   const [filteredPage, setFilteredPage] = useState(1);
   const[totalFilteredRecords, setTotalFilteredRecords] = useState(0);
   const [totalFilteredPages, setTotalFilteredPages] = useState(1);
-
-
   const [totalRecords, setTotalRecords] = useState(0); // Add a state for total pages
   const [distinctValues, setDistinctValues] = useState({}); // State to store distinct column values
   const [selectedValues, setSelectedValues] = useState({}); // State to store selected values for filtering
@@ -235,7 +230,7 @@ const renderPieChart = (labels, columnPercentages) => {
 };
 
 
-  // Your existing useEffect logic
+  // Existing useEffect logic
   if (chartRendered && filteredTableData) {
     renderPieChart(Object.keys(columnPercentages), columnPercentages);
   }
@@ -248,10 +243,6 @@ const renderPieChart = (labels, columnPercentages) => {
   };
 }, [chartRendered, columnPercentages, filteredTableData]);
 
-
-
-
-////
       useEffect(() => {
         const fetchTable = async () => {
           if (selectedDatabase && selectedTable && !isFiltering) {
@@ -344,35 +335,6 @@ useEffect(() => {
     }
   };
 
-/*const handleDeleteDatabase = async (dbNameToDelete) => {
-  try {
-    const response = await fetch(`http://localhost:8082/api/delete-database/${selectedDatabase}`, {
-      method: 'DELETE',
-    });
-
-    if (response.ok) {
-      console.log('Database deleted successfully:', selectedDatabase);
-      // Update UI to reflect the deleted database
-      fetch('http://localhost:8082/api/user-databases')
-              .then((response) => {
-                if (response.status === 200) {
-                  return response.json();
-                } else {
-                  throw new Error('Unauthorized');
-                }
-              })
-              .then((data) => setDatabases(data))
-              .catch((error) => {
-                console.error(error);
-              });
-      // For example, remove it from the list of databases
-    } else {
-      console.error('Failed to delete the database');
-    }
-  } catch (error) {
-    console.error(error);
-  }
-};*/
 
 const handleDeleteDatabase = async (dbNameToDelete) => {
   // Prompt the user for confirmation
@@ -661,11 +623,6 @@ const fetchTotalFilteredRecords = async (filters, page) => {
   }
 };
 
-
-
-  //added
-
-  //new
 const fetchDistinctColumnValues = async (columnName) => {
   console.log("Selected Database:", selectedDatabase);
   console.log("Table Name:", selectedTable);
@@ -692,9 +649,7 @@ const fetchDistinctColumnValues = async (columnName) => {
   }
 };
 
-/*const handleTableClick = (tableName) => {
 
-}*/
     // Function to handle the selection of a table
    const handleTableSelect = async () => {
       try {
@@ -827,7 +782,7 @@ const fetchFilteredData = async (filters, page) => {
         }
       };
 
-//nou
+
 const handleTypeAheadSelect = async (columnName, selectedValue) => {
   setInputValues((prevInputValues) => ({
     ...prevInputValues,
@@ -993,10 +948,6 @@ return (
     ))
   )}
 </div>
-
-
-
-
         <div className="charts-container">
                 <div id="pieChart_container">
                   <canvas id="pieChart" ref={canvasRef} width="300" height="300"></canvas>
