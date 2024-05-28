@@ -26,7 +26,7 @@ public class DataProcessor {
         this.spark = spark;
     }
 
-
+    // Creeate a schema
     public static String createSchema(Connection connection, String userId,String userName, String dbName) throws SQLException {
         System.out.println("Schema name: " + dbName);
 
@@ -58,7 +58,7 @@ public class DataProcessor {
     }
 
 
-
+    // Get users databases
     public static List<String> getUserDatabases(Connection connection, String userId) throws SQLException {
         // Implement the logic to retrieve user's databases
         List<String> databases = new ArrayList<>();
@@ -80,7 +80,7 @@ public class DataProcessor {
         return databases;
     }
 
-
+    //Insert files in the database
     public static List<String> insertFileIntoDatabase(String selectedDatabase, String uploadedFilePath, String loggedInUsername) {
         File uploadedFileObj = new File(uploadedFilePath);
 
@@ -187,6 +187,7 @@ public class DataProcessor {
         return uploadedData;
     }
 
+    //get the available tables froma database
     public static List<String> getTablesInDatabase(Connection connection, String loggedInUserId, String selectedDatabase) {
         List<String> tables = new ArrayList<>();
 
@@ -212,6 +213,7 @@ public class DataProcessor {
         return tables;
     }
 
+    //get the data from a table
     public static List<Map<String, Object>> getTableData(Connection connection, String selectedDatabase, String tableName, int pageNumber, int pageSize) {
         List<Map<String, Object>> tableData = new ArrayList<>();
 
@@ -247,7 +249,7 @@ public class DataProcessor {
         return tableData;
     }
 
-
+   //get the total number of the records from a file
     public static int getTotalRecords(Connection connection,String selectedDatabase, String tableName) throws SQLException {
         int totalRecords = 0;
         String query = "SELECT COUNT(*) FROM " + selectedDatabase + "." + tableName;
@@ -263,7 +265,8 @@ public class DataProcessor {
             return totalRecords;
 
     }
-    
+
+    //get the total number of filtered records from a file
     public static int getTotalFilteredRecords(Connection connection, String selectedDatabase, String tableName, Map<String, String> filters) throws SQLException {
         int totalFilteredRecords = 0;
 
@@ -306,7 +309,7 @@ public class DataProcessor {
         return totalFilteredRecords;
     }
 
-
+    //get the filtered data from a table
     public static List<Map<String, Object>> getFilteredTableData(Connection connection, String selectedDatabase, String tableName, int page, int pageSize, Map<String, String> filters) {
         // Retrieve foreign key information
         Map<String, String> foreignKeys = getForeignKeyInformation(connection, selectedDatabase, tableName);
@@ -354,7 +357,7 @@ public class DataProcessor {
         return foreignKeys;
     }
 
-
+    // prepares the filtered data query
     private static String buildFilteredQuery(String selectedDatabase, String tableName, Map<String, String> filters, Map<String, String> foreignKeys, int page, int pageSize) {
         StringBuilder queryBuilder = new StringBuilder("SELECT * FROM ");
         queryBuilder.append(selectedDatabase).append(".").append(tableName);
@@ -383,6 +386,7 @@ public class DataProcessor {
         return queryBuilder.toString();
     }
 
+    // executes the filtered data query
     private static List<Map<String, Object>> executeFilteredQuery(Connection connection, String selectedDatabase, String query) {
         List<Map<String, Object>> result = new ArrayList<>();
 
