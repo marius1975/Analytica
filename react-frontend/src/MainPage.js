@@ -11,6 +11,7 @@ const MainPage = ({ isLoggedIn, onLogin, onRegister }) => {
   const [formType, setFormType] = useState(null);
   const [selectedTab, setSelectedTab] = useState('home');
 
+  //handle the tab switch from the main page
   const handleMenuClick = (type) => {
     setSelectedTab(type);
     setFormType(null); // Reset form type when switching tabs
