@@ -300,7 +300,7 @@ required
 
 export default RegistrationForm;
 
-CreateSchemaForm.js
+CreateSchemaForm
 
 Handles various functionalities as database creation, upload files to the database and data visualization.
 
